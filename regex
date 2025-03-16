@@ -3,3 +3,77 @@ phone_regex = re.compile(r'\s*([\w@+*.()-]+)(?:\s+(.+))?')
 
 email_regex = re.compile(r'[\w.+-]+@[\w-]+(?:\.[\w-]+)+')
 
+import pandas as pd
+import re
+
+# Sample DataFrame
+data = {'Details': [
+    "from: *1 (123) 123-1231 John Doe\nto: +1-456-789-0123 Alice",  # Phone numbers
+    "from: +123-456-679 O'Connor-Bob\nto: *123401-1231 Jean-Luc",  # + and *
+    "from: user_123@signal.net Mário\nto: support@company.com Zoë",  # Standard emails
+    "from: *555 666 777",  # "from" without name
+    "to: +999-888-777",  # "to" without name
+    "to: support@company.com Zoë",  # Simple email
+    "to: example.email@sub.domain.co.uk Full Name",  # Complex email
+    "to: contact-info@engineering.department.university.edu Prof. Smith",  # Deep subdomains
+    "random text that does not match"  # No match case
+]}
+df = pd.DataFrame(data)
+
+# Separate regex for phone numbers and emails
+phone_regex = re.compile(r'[\*\+]?\s*[\d\s().-]+')
+email_regex = re.compile(r'[\w.+-]+@[\w-]+(?:\.[\w-]+)+')  # ✅ Fixed for multi-dot domains
+
+# Function to extract details
+def extract_details(text):
+    # Split text into separate lines
+    lines = text.split('\n')
+
+    phone_from, name_from, phone_to, name_to = None, None, None, None
+
+    # General regex for "from:" and "to:"
+    regex_from = re.compile(r'from:\s*(.+)')
+    regex_to = re.compile(r'to:\s*(.+)')
+
+    for line in lines:
+        match_from = regex_from.search(line)
+        match_to = regex_to.search(line)
+
+        # Process "from" match
+        if match_from:
+            raw_data = match_from.group(1).strip()
+            phone_match = phone_regex.match(raw_data)
+            email_match = email_regex.match(raw_data)
+
+            if email_match:
+                phone_from = email_match.group(0)  # Email detected
+                name_from = raw_data.replace(phone_from, "").strip() or None
+            elif phone_match:
+                phone_from = phone_match.group(0)  # Phone detected
+                name_from = raw_data.replace(phone_from, "").strip() or None
+
+        # Process "to" match
+        if match_to:
+            raw_data = match_to.group(1).strip()
+            phone_match = phone_regex.match(raw_data)
+            email_match = email_regex.match(raw_data)
+
+            if email_match:
+                phone_to = email_match.group(0)  # Email detected
+                name_to = raw_data.replace(phone_to, "").strip() or None
+            elif phone_match:
+                phone_to = phone_match.group(0)  # Phone detected
+                name_to = raw_data.replace(phone_to, "").strip() or None
+
+    return pd.Series([phone_from, name_from, phone_to, name_to])
+
+# Apply Extraction to the DataFrame
+df[['Phone Number From', 'Name From', 'Phone Number To', 'Name To']] = df['Details'].apply(extract_details)
+
+# Drop the original column (optional)
+df.drop(columns=['Details'], inplace=True)
+
+# Display the DataFrame
+import ace_tools as tools
+tools.display_dataframe_to_user(name="Extracted Data", dataframe=df)
+
