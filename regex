@@ -1,2 +1,2 @@
-match_from = re.search(r'from:\s*([\w@.-]+)(?:\s+(\w+))?', text)  # Captures phone + optional name
-    match_to = re.search(r'to:\s*([\w@.-]+)(?:\s+(\w+))?', text)  # Captures phone + optional name 
+match_from = re.search(r'from:\s*([\w@.-]+)(?:\s+([^\d@][\w\s-]+))?', text)  # Capture phone & optional name
+    match_to = re.search(r'to:\s*([\w@.-]+)(?:\s+([^\d@][\w\s-]+))?', text)  # Capture phone & optional name
