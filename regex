@@ -1,2 +1,5 @@
- regex_from = re.compile(r'from:\s*([\w@+*.()-]+)(?:\s+(.+))?')
-    regex_to = re.compile(r'to:\s*([\w@+*.()-]+)(?:\s+(.+))?')
+# Phone number regex (supports +, *, spaces, parentheses, dashes)
+phone_regex = re.compile(r'[\*\+]?\s*[\d\s().-]+')
+
+# Email regex (requires @ with domain)
+email_regex = re.compile(r'[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}')
