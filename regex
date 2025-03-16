@@ -1,2 +1,2 @@
-regex_to = re.compile(r'to:\s*[\*\+]?\s*([\d\s().-]+)(?:\s+(.+))?')
-regex_from = re.compile(r'from:\s*[\*\+]?\s*([\d\s().-]+)(?:\s+(.+))?')
+ regex_from = re.compile(r'from:\s*([\w@+*.()-]+)(?:\s+(.+))?')
+    regex_to = re.compile(r'to:\s*([\w@+*.()-]+)(?:\s+(.+))?')
